@@ -1,0 +1,5 @@
+python-dotenv~=1.1.0
+utils~=1.0.2
+pytest~=8.3.5
+requests~=2.32.3
+Faker~=37.1.0
