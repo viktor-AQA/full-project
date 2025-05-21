@@ -1,7 +1,13 @@
-# from utils.helpers import CLICKUP_EMAIL, CLICKUP_PASSWORD
+from src.api_clients.api_class import ApiClass
+from src.api_clients.scenarios import Scenarios
 
+class TestTasks:
 
-# class TestsClickup:
-#     BASE_URL = 'https://api.clickup.com/api'
-#
-#     def create_task(self):
+    def test_full_flow(self, data_task):
+        # Инициализация клиента API
+        api_client = ApiClass()
+        scenarios = Scenarios(api_client)
+
+        # Выполнение сценария
+        result = scenarios.full_flow_create_and_delete_task(data_task)
+

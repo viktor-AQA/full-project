@@ -16,7 +16,6 @@ def helpers():
 CLICKUP_API_KEY = get_env_variable("CLICKUP_API_KEY")
 CLICKUP_EMAIL = get_env_variable("CLICKUP_EMAIL")
 CLICKUP_PASSWORD = get_env_variable("CLICKUP_PASSWORD")
-LIST_ID = get_env_variable("LIST_ID")
 
 BASE_URL = 'https://api.clickup.com/api'
 
