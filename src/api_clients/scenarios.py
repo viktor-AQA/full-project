@@ -6,8 +6,32 @@ class Scenarios:
         self.api_client = api_client
         self.ids = {}
 
+    def create_task(self, data_task, list_id):
+        create_task_data = self.api_client.post_task_create(data_task, list_id)
+        task_id = create_task_data.get("id")
+        assert task_id is not None, f"ID не найден в ответе на создание: {create_task_data}"
+
+        self.api_client.delete_task(task_id)
+        print(f"Task с ID {task_id} успешно создана и удалена.")
+        return task_id
+
+    def get_task_by_id(self, task_id):
+        get_task_by_id = self.api_client.get_task(task_id)
+        task_id = get_task_by_id.get("id")
+        assert task_id is not None, "ID не найден в ответе"
+
+        print(f"Task с ID {task_id} найдена.")
+        return task_id
+
+    def update_task(self, upd_data_task, task_id):
+        response = self.api_client.get_task(task_id)
+        json_before_upd = response.json()
+        update_task = self.api_client.put_task_update(task_id, upd_data_task)
+        json_after_upd = update_task.json()
+        assert json_before_upd != json_after_upd, "Данные не были обновлены"
+
     def full_flow_create_and_delete_task(self, data_task):
-        self.ids['team_id'] = self.api_client.get_team()
+        self.ids['team_id'] = self.api_client.get_teams()
         print(f"Получен team_id: {self.ids['team_id']}")
 
         # 2. Получаем space_id

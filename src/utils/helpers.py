@@ -16,11 +16,17 @@ def helpers():
 CLICKUP_API_KEY = get_env_variable("CLICKUP_API_KEY")
 CLICKUP_EMAIL = get_env_variable("CLICKUP_EMAIL")
 CLICKUP_PASSWORD = get_env_variable("CLICKUP_PASSWORD")
+LIST_ID = get_env_variable("LIST_ID")
 
-BASE_URL = 'https://api.clickup.com/api'
+BASE_URL = 'https://api.clickup.com/api/v2'
 
 AUTH_HEADERS = {
-    "Authorization": "CLICKUP_API_KEY",
+    "Authorization": f"{CLICKUP_API_KEY}",
     "Accept": "application/json"
 }
 
+AUTH_HEADERS_UPD = {
+    "Authorization": f"{CLICKUP_API_KEY}",
+    "Accept": "application/json",
+    "Content-type":"application/json"
+}

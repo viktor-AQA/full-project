@@ -3,7 +3,14 @@ import requests
 from faker import Faker
 from requests import post, delete
 
-from src.utils.helpers import CLICKUP_API_KEY, CLICKUP_EMAIL, CLICKUP_PASSWORD, BASE_URL, AUTH_HEADERS, LIST_ID
+from src.utils.helpers import BASE_URL, AUTH_HEADERS
+
+
+@pytest.fixture(scope="session")
+def auth_session():
+    session = requests.Session()
+    session.headers.update(AUTH_HEADERS)
+    return session
 
 fake = Faker()
 
@@ -16,8 +23,28 @@ def data_task():
         }
 
 @pytest.fixture
-def task_id(data_task):
-    response = post(f"{BASE_URL}/v2/list/{LIST_ID}/task", headers=AUTH_HEADERS, json=data_task)
+def upd_data_task():
+    return {
+            "name": fake.file_name(),
+            "description": fake.sentence(nb_words=10),
+            "priority": fake.random_int(min=1, max=4)
+        }
+
+@pytest.fixture
+def list_id(auth_session):
+    response = auth_session.get(f"{BASE_URL}/team", headers=AUTH_HEADERS)
+    teams_id = response.json()['teams'][0]['id']
+    response = auth_session.get(f"{BASE_URL}/team/{teams_id}/space", headers=AUTH_HEADERS)
+    space_id = response.json()['spaces'][0]['id']
+    response = auth_session.get(f"{BASE_URL}/space/{space_id}/folder", headers=AUTH_HEADERS)
+    folders_id = response.json()['folders'][0]['id']
+    response = auth_session.get(f"{BASE_URL}/folder/{folders_id}/list", headers=AUTH_HEADERS)
+    list_id = response.json()['lists'][0]['id']
+    return list_id
+
+@pytest.fixture
+def task_id(data_task, auth_session, list_id):
+    response = auth_session.post(f"{BASE_URL}/list/{list_id}/task", headers=AUTH_HEADERS, json=data_task)
     assert response.status_code in (200, 201), f"Item creation failed: {response.text}"
 
     task_id = response.json().get("id")
@@ -25,19 +52,6 @@ def task_id(data_task):
 
     yield task_id
 
-    delete(f"{BASE_URL}/api/v1/items/{task_id}")
+    auth_session.delete(f"{BASE_URL}/task/{task_id}")
 
 
-@pytest.fixture(scope="session")
-def auth_session():
-    session = requests.Session()
-    response = session.post(f"{BASE_URL}/v2/oauth/token", data=AUTH_DATA, headers=AUTH_HEADERS)
-    assert response.status_code == 200, f"Auth failed: {response.status_code}, {response.text}"
-
-    token = response.json().get("access_token")
-    assert token, "No access_token found"
-
-    session.headers.update(API_HEADERS)
-    session.headers.update({"Authorization": f"Bearer {token}"})
-
-    return session
