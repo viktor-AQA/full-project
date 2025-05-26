@@ -1,4 +1,8 @@
+import pytest
+import requests
+
 from src.api_clients.api_class import ApiClass
+from src.tests.api.conftest import task_id
 
 
 class Scenarios:
@@ -23,12 +27,47 @@ class Scenarios:
         print(f"Task с ID {task_id} найдена.")
         return task_id
 
-    def update_task(self, upd_data_task, task_id):
-        response = self.api_client.get_task(task_id)
-        json_before_upd = response.json()
-        update_task = self.api_client.put_task_update(task_id, upd_data_task)
-        json_after_upd = update_task.json()
-        assert json_before_upd != json_after_upd, "Данные не были обновлены"
+    def get_task_with_invalid_id(self, invalid_id):
+        with pytest.raises(requests.exceptions.HTTPError) as exc_info:
+            self.api_client.get_task(invalid_id)
+
+        assert exc_info.value.response.status_code in (401, 404), (
+            f"Ожидался статус 401 или 404, получен {exc_info.value.response.status_code}"
+        )
+
+    def update_task(self, upd_data_task, task_id, data_task):
+        before_upd = self.api_client.get_task(task_id)
+        assert data_task["name"] == before_upd.get("name")
+        assert data_task["description"] == before_upd.get("description")
+        assert data_task["priority"] == int(before_upd["priority"]["id"])
+
+        after_upd = self.api_client.put_task_update(task_id, upd_data_task)
+        assert upd_data_task["name"] == after_upd.get("name")
+        assert upd_data_task["description"] == after_upd.get("description")
+        assert upd_data_task["priority"] == int(after_upd["priority"]["id"])
+
+        assert after_upd != before_upd, "Обновления данных не произошло"
+
+    def update_with_empty_data(self, task_id, data_task):
+        before_upd = self.api_client.get_task(task_id)
+        assert data_task["name"] == before_upd.get("name")
+        assert data_task["description"] == before_upd.get("description")
+        assert int(data_task["priority"]) == int(before_upd["priority"]["id"])
+
+        upd_data_task = {}
+        after_upd = self.api_client.put_task_update(task_id, upd_data_task)
+
+        assert before_upd.get("name") == after_upd.get("name")
+        assert before_upd.get("description") == after_upd.get("description")
+        assert int(before_upd["priority"]["id"]) == int(after_upd["priority"]["id"])
+
+    def delete_without_id(self):
+        task_id = None
+        with pytest.raises(requests.exceptions.HTTPError) as exc_info:
+            self.api_client.delete_task(task_id)
+
+        assert exc_info.value.response.status_code in (401, 404), (
+            f"Ожидался статус 401 или 404, получен {exc_info.value.response.status_code}")
 
     def full_flow_create_and_delete_task(self, data_task):
         self.ids['team_id'] = self.api_client.get_teams()

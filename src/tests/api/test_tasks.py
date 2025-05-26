@@ -16,17 +16,33 @@ class TestTasks:
 
         scenarios.get_task_by_id(task_id)
 
-    def test_update_task(self, auth_session, upd_data_task, list_id):
+    def test_get_invalid_ids(self, auth_session, invalid_id):
         api_client = ApiClass(auth_session)
         scenarios = Scenarios(api_client)
 
-        scenarios.update_task(upd_data_task, list_id)
+        scenarios.get_task_with_invalid_id(invalid_id)
+
+    def test_update_task(self, auth_session, upd_data_task, task_id, data_task):
+        api_client = ApiClass(auth_session)
+        scenarios = Scenarios(api_client)
+
+        scenarios.update_task(upd_data_task, task_id, data_task)
+
+    def test_update_with_empty_body(self, auth_session, task_id, data_task):
+        api_client = ApiClass(auth_session)
+        scenarios = Scenarios(api_client)
+
+        scenarios.update_with_empty_data(task_id, data_task)
+
+    def test_delete_without_id(self, auth_session):
+        api_client = ApiClass(auth_session)
+        scenarios = Scenarios(api_client)
+
+        scenarios.delete_without_id()
 
     def test_full_flow(self, auth_session, data_task):
         # Инициализация клиента API
         api_client = ApiClass(auth_session)
         scenarios = Scenarios(api_client)
 
-        # Выполнение сценария
         result = scenarios.full_flow_create_and_delete_task(data_task)
-
