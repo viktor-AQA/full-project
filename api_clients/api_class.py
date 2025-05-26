@@ -1,6 +1,3 @@
-import pytest
-import requests
-
 from src.utils.helpers import BASE_URL, AUTH_HEADERS, AUTH_HEADERS_UPD
 
 

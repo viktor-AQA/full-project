@@ -1,5 +1,6 @@
-from src.api_clients.api_class import ApiClass
-from src.api_clients.scenarios import Scenarios
+from api_clients.api_class import ApiClass
+from api_clients.scenarios import Scenarios
+
 
 class TestTasks:
 

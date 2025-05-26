@@ -1,8 +1,7 @@
 import pytest
 import requests
 
-from src.api_clients.api_class import ApiClass
-from src.tests.api.conftest import task_id
+from api_clients.api_class import ApiClass
 
 
 class Scenarios:

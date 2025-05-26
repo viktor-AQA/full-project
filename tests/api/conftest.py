@@ -1,9 +1,8 @@
 import pytest
 import requests
 from faker import Faker
-from requests import post, delete
 
-from src.utils.helpers import CLICKUP_API_KEY, CLICKUP_EMAIL, CLICKUP_PASSWORD, BASE_URL, AUTH_HEADERS, LIST_ID
+from src.utils.helpers import BASE_URL, AUTH_HEADERS
 
 
 @pytest.fixture
