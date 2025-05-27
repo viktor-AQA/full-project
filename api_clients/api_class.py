@@ -59,4 +59,3 @@ class ApiClass:
             return {"status": "success", "message": "Task deleted"}
         response.raise_for_status()
         return response.json()
-
