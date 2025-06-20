@@ -15,12 +15,13 @@ def test_unsuccessful_login(browser, fake_password):
 
     login_page.not_valid_login(username=CLICKUP_EMAIL, password=fake_password)
 
-def test_create_task(browser, login, task_name):
+def test_create_task(browser, task_name, team_id, get_task_locator):
     page = browser.new_page()
-    board_page = BoardPage(page)
+    login_page = LoginPage(page)
+    board_page = BoardPage(page, team_id)
 
-    success_login = login
-    board_page.create_task(task_name)
+    login_page.login(username=CLICKUP_EMAIL, password=CLICKUP_PASSWORD)
+    board_page.create_task(task_name, get_task_locator)
 
 
 

@@ -19,6 +19,8 @@ class LoginPage(BasePage):
         self.wait_for_selector_and_click(self.LOGIN_BUTTON_SELECTOR)
         self.assert_element_is_visible(self.CHECKOUT_CONTAINER)
 
+        self.page.wait_for_url(lambda url: "login" not in url, timeout=10000)
+
     def not_valid_login(self, username: str, password: str):
         self.navigate_to()
         self.wait_for_selector_and_fill(self.USERNAME_SELECTOR, username)

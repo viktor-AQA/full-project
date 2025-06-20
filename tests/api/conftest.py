@@ -1,6 +1,7 @@
 import pytest
 import requests
 from faker import Faker
+from pydantic import BaseModel
 
 from src.utils.helpers import BASE_URL, AUTH_HEADERS
 
@@ -13,21 +14,39 @@ def auth_session():
 
 fake = Faker()
 
+class DataTask(BaseModel):
+    name: str
+    description: str
+    priority: int
+
+    @classmethod
+    def generate(cls):
+        return cls(
+            name=fake.name(),
+            description=fake.sentence(nb_words=10),
+            priority=fake.random_int(min=1, max=4)
+        )
+
 @pytest.fixture
 def data_task():
-    return {
-            "name": fake.file_name(),
-            "description": fake.sentence(nb_words=10),
-            "priority": fake.random_int(min=1, max=4)
-        }
+    return DataTask.generate().model_dump()
+
+class UpdDataTask(BaseModel):
+    name: str
+    description: str
+    priority: int
+
+    @classmethod
+    def generate(cls):
+        return cls(
+            name=fake.name(),
+            description=fake.sentence(nb_words=10),
+            priority=fake.random_int(min=1, max=4)
+        )
 
 @pytest.fixture
 def upd_data_task():
-    return {
-            "name": fake.file_name(),
-            "description": fake.sentence(nb_words=10),
-            "priority": fake.random_int(min=1, max=4)
-        }
+    return UpdDataTask.generate().model_dump()
 
 @pytest.fixture(params=[None, "", "invalid", 123, "NULL"])
 def invalid_id(request):

@@ -48,10 +48,6 @@ def data_task():
     }
 
 @pytest.fixture
-def task_name():
-    return fake.file_name()
-
-@pytest.fixture
 def task_id(data_task, auth_session, list_id):
     response = auth_session.post(f"{BASE_URL}/list/{list_id}/task", headers=AUTH_HEADERS, json=data_task)
     assert response.status_code in (200, 201), f"Item creation failed: {response.text}"
@@ -62,3 +58,20 @@ def login(browser):
     login_page = LoginPage(page)
 
     login_page.login(username=CLICKUP_EMAIL, password=CLICKUP_PASSWORD)
+
+@pytest.fixture
+def team_id(auth_session):
+    """ возвращает нам teams_id """
+    response = auth_session.get(f"{BASE_URL}/team", headers=AUTH_HEADERS)
+    if response.status_code != 200:  # Проверяем успешный статус
+        response.raise_for_status()  # Выбросит HTTPError для плохих статусов
+    teams_id = response.json()['teams'][0]['id']
+    return teams_id
+
+@pytest.fixture
+def task_name():
+    return fake.file_name()
+
+@pytest.fixture
+def get_task_locator(task_name):
+    return f"[data-test='board-task__ellipsis-menu__{task_name}']"

@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+from dataclasses import dataclass
+from typing import Dict
 
 
 load_dotenv()
@@ -18,15 +20,28 @@ CLICKUP_EMAIL = get_env_variable("CLICKUP_EMAIL")
 CLICKUP_PASSWORD = get_env_variable("CLICKUP_PASSWORD")
 LIST_ID = get_env_variable("LIST_ID")
 
-BASE_URL = 'https://api.clickup.com/api/v2'
+@dataclass
+class ClickUpAPIClient:
+    api_key: str
+    base_url: str = 'https://api.clickup.com/api/v2'
 
-AUTH_HEADERS = {
-    "Authorization": f"{CLICKUP_API_KEY}",
-    "Accept": "application/json"
-}
+    @property
+    def auth_headers(self) -> Dict[str, str]:
+        return {
+            "Authorization": self.api_key,
+            "Accept": "application/json"
+        }
 
-AUTH_HEADERS_UPD = {
-    "Authorization": f"{CLICKUP_API_KEY}",
-    "Accept": "application/json",
-    "Content-type":"application/json"
-}
+    @property
+    def auth_headers_upd(self) -> Dict[str, str]:
+        return {
+            **self.auth_headers,
+            "Content-type":"application/json"
+        }
+
+config = ClickUpAPIClient(api_key=CLICKUP_API_KEY)
+
+AUTH_HEADERS = config.auth_headers
+AUTH_HEADERS_UPD = config.auth_headers_upd
+BASE_URL = config.base_url
+
